@@ -96,15 +96,16 @@ function printQuiz(data)
         let value2=data["data"][i]["value2"];
         let value3=data["data"][i]["value3"];
         let dataUuid=data["data"][i]["uuid"];
+        
         tableRows=tableRows+
         `
             <tr>
                
-                <td class='${dataUuid}' onclick="handleSelection('${figure}','${dataUuid}',0,${numColumns})">${value0}</td>
+                <td id="${dataUuid}c0" class='${dataUuid}' onclick="handleSelection('${figure}','${dataUuid}',0,${numColumns})">${value0}</td>
                
-                <td class='${dataUuid}' onclick="handleSelection('${figure}','${dataUuid}',1,${numColumns})">${value1}</td>
-                <td class='${dataUuid}' onclick="handleSelection('${figure}','${dataUuid}',2,${numColumns})">${value2}</td>
-                <td class='${dataUuid}' onclick="handleSelection('${figure}','${dataUuid}',3,${numColumns})">${value3}</td>
+                <td id="${dataUuid}c1" class='${dataUuid}' onclick="handleSelection('${figure}','${dataUuid}',1,${numColumns})">${value1}</td>
+                <td id="${dataUuid}c2" class='${dataUuid}' onclick="handleSelection('${figure}','${dataUuid}',2,${numColumns})">${value2}</td>
+                <td id="${dataUuid}c3" class='${dataUuid}' onclick="handleSelection('${figure}','${dataUuid}',3,${numColumns})">${value3}</td>
             </tr>
 
         `;
@@ -120,6 +121,7 @@ function handleSelection(figure,uuid,column,numColumns)
 {
   
     let selection={figure:figure,uuid:uuid,column:column,numColumns:numColumns};
+    
    // console.log(selection);
     selectionArray.push(selection);
     checkSelectionArray();
@@ -133,6 +135,22 @@ function deleteUuidClass(uuid)
     {
         targeted[i].innerHTML='';
     }
+}
+
+
+function isToggle()
+{
+    let lastElement=selectionArray[selectionArray.length-1];
+    let targetedColumn=lastElement["column"];
+    let targetedUuid=lastElement["uuid"];
+    for(let i=0;i<selectionArray.length-1;i++)
+    {
+        if (selectionArray[i]["column"]==targetedColumn && selectionArray[i]["uuid"]==targetedUuid)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 function checkSelectionArray()
@@ -159,13 +177,18 @@ function checkSelectionArray()
         columnsSelection[column]+=1;
     }
 
-    if (columnsSelection.indexOf(2)!= -1)
+
+    
+
+
+    if (columnsSelection.indexOf(2)!= -1 )
     {
         let savedSelection=selectionArray.pop();
         selectionArray.length=[];
         selectionArray.push(savedSelection);
         console.log("selection array reset and new choice is ",selectionArray);
     }
+    
 
     if(selectionArray.length==numColumns)
     {
@@ -185,6 +208,23 @@ function checkSelectionArray()
             console.log("But the answer is wrong");
             selectionArray.length=[];
         }
+    }
+
+
+    let allTds=document.getElementsByTagName("td");
+    for(let i=0;i<allTds.length;i++)
+    {
+        allTds[i].classList.remove('selected');
+    }
+
+    for(let i=0;i<selectionArray.length;i++)
+    {
+        let column=selectionArray[i]["column"];
+        let uuid=selectionArray[i]["uuid"];
+        let id=uuid+"c"+column;
+        console.log("id",id);
+        const element=document.getElementById(id);
+        element.classList.add("selected");
     }
    
 
