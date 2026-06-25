@@ -1,3 +1,9 @@
+let quizWrongCount=0;
+let numQuestions=0;
+let quizRightCount=0;
+
+
+
 function initializeQuiz2()
 {
     console.log("quiz 2 page");
@@ -32,7 +38,7 @@ function printAvailableFiguresForEdit(data)
     {
         console.log(data[i]["figure"]);
         outputButtons+=
-        `<button onClick="handleFigureButtons('${data[i]["figure"]}')">${data[i]["figure"]}</button>`;
+        `<button onClick="handleFigureButtons('${data[i]["figure"]}')">${data[i]["figure"]}|${data[i]["description"]}</button>`;
     }
     document.getElementById("buttonOutputArea").innerHTML=outputButtons;
 }
@@ -44,13 +50,26 @@ function handleFigureButtons(data)
     
 }
 
+function shuffle(array)
+{
+    for(let i=array.length-1;i>0;i--)
+    {
+        const j = Math.floor(Math.random()*(i+1));
+        [array[i],array[j]]=[array[j],array[i]];
+    }
+    return array;
+}
+
 
 
 
 function printQuiz(data)
 {
     console.log(data["data"]);
+    numQuestions=data["data"].length;
     
+    document.getElementById("rightWrongStatus").innerHTML="--:";
+
     let figure=data["metaData"][0]["figure"]; 
     let chapter=data["metaData"][0]["chapter"]; 
     let description=data["metaData"][0]["description"];
@@ -102,7 +121,6 @@ function printQuiz(data)
             <tr>
                
                 <td id="${dataUuid}c0" class='${dataUuid}' onclick="handleSelection('${figure}','${dataUuid}',0,${numColumns})">${value0}</td>
-               
                 <td id="${dataUuid}c1" class='${dataUuid}' onclick="handleSelection('${figure}','${dataUuid}',1,${numColumns})">${value1}</td>
                 <td id="${dataUuid}c2" class='${dataUuid}' onclick="handleSelection('${figure}','${dataUuid}',2,${numColumns})">${value2}</td>
                 <td id="${dataUuid}c3" class='${dataUuid}' onclick="handleSelection('${figure}','${dataUuid}',3,${numColumns})">${value3}</td>
@@ -112,6 +130,8 @@ function printQuiz(data)
     }
     let tableContents=tableOpener+tableHeaders+tableRows+tableCloser;
     document.getElementById("quizTableOutput").innerHTML=tableContents;
+    quizWrongCount=0;
+    quizRightCount=0;
 }
 
 
@@ -130,7 +150,7 @@ function handleSelection(figure,uuid,column,numColumns)
 function deleteUuidClass(uuid)
 {
     let targeted=document.getElementsByClassName(uuid);
-    console.log('targeted',targeted);
+ //   console.log('targeted',targeted);
     for(let i=0;i<targeted.length;i++)
     {
         targeted[i].innerHTML='';
@@ -167,8 +187,8 @@ function checkSelectionArray()
     let primeUuid=selectionArray[0].uuid;
 
 
-    console.log('prime uuid is',primeUuid);
-    console.log('num columns is ',numColumns);
+   // console.log('prime uuid is',primeUuid);
+  //  console.log('num columns is ',numColumns);
     for(let i=0;i<selectionArray.length;i++)
     {
         let column=selectionArray[i]["column"];
@@ -177,41 +197,36 @@ function checkSelectionArray()
         columnsSelection[column]+=1;
     }
 
-
-    
-
-
     if (columnsSelection.indexOf(2)!= -1 )
     {
         let savedSelection=selectionArray.pop();
         selectionArray.length=[];
         selectionArray.push(savedSelection);
-        console.log("selection array reset and new choice is ",selectionArray);
+      //  console.log("selection array reset and new choice is ",selectionArray);
     }
     
-
     if(selectionArray.length==numColumns)
     {
         
-        console.log("Array is full, ready to submit");
-        console.log("uuid selection",uuidSelection);
-        console.log(uuidSelection[primeUuid]==numColumns);
+     //   console.log("Array is full, ready to submit");
+     //   console.log("uuid selection",uuidSelection);
+     //   console.log(uuidSelection[primeUuid]==numColumns);
        // console.log(primeUuid);
         if(uuidSelection[primeUuid]==numColumns)
         {
-            console.log("And the answer is correct");
+            writeToRightWrong(true);
             selectionArray.length=[];
             deleteUuidClass(primeUuid);
         }
         else 
         {
-            console.log("But the answer is wrong");
+            writeToRightWrong(false);
             selectionArray.length=[];
         }
     }
 
-
     let allTds=document.getElementsByTagName("td");
+    
     for(let i=0;i<allTds.length;i++)
     {
         allTds[i].classList.remove('selected');
@@ -222,12 +237,10 @@ function checkSelectionArray()
         let column=selectionArray[i]["column"];
         let uuid=selectionArray[i]["uuid"];
         let id=uuid+"c"+column;
-        console.log("id",id);
+      //  console.log("id",id);
         const element=document.getElementById(id);
         element.classList.add("selected");
     }
-   
-
 }
 
 function checkAnswersInSelectionArray()
@@ -243,6 +256,35 @@ function checkAnswersInSelectionArray()
     }
     console.log("Correct");
     return true;
+}
+
+
+function writeToRightWrong(correct)
+{
+    let outputMessage='';
+    let tag="--:";
+    if(correct)
+    {
+          outputMessage=tag+"That's right!"
+          quizRightCount+=1;
+    }
+    else 
+    {
+           outputMessage=tag+"No that's not right";
+           quizWrongCount+=1;
+           document.getElementById("wrongCount").innerHTML="Wrong Answers:"+quizWrongCount;
+    }
+    document.getElementById("rightWrongStatus").innerHTML=outputMessage;
+    if(quizRightCount==numQuestions)
+    {
+        
+        document.getElementById("rightWrongStatus").innerHTML="The quiz is over! You had "+quizWrongCount+" incorrect tries out of " + numQuestions + " questions";
+        selectionArray.length=[];
+        quizRightCount=0;
+        quizWrongCount=0;
+        document.getElementById("quizTableOutput").innerHTML='';
+      //  document.getElementById("rightWrongStatus").innerHTML='';
+    }
 }
 
 function callBackendQ2(inputFunction,parameters,callback)

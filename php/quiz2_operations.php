@@ -3,7 +3,7 @@
 function fetchRecordsList()
 {
     include 'db_connect.php';
-    $stmt=$conn->prepare("select figure,uuid from memorymeta");
+    $stmt=$conn->prepare("select figure,uuid,description from memorymeta");
     $outputArray=[];
     $outputMessage='no action';
     if ($stmt->execute())
@@ -13,7 +13,8 @@ function fetchRecordsList()
                 {
                     $figure=$row["figure"];
                     $uuid=$row["uuid"];
-                    $unitArray=['figure'=>$figure,'uuid'=>$uuid];
+                    $description=$row["description"];
+                    $unitArray=['figure'=>$figure,'uuid'=>$uuid,'description'=>$description];
                     
                     array_push($outputArray,$unitArray);
                 }

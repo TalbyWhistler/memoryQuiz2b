@@ -10,3 +10,9 @@ h1
     background-color:black;
     color:white;
 }
+
+
+.row 
+{
+    display:flex;
+}
