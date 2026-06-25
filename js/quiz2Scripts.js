@@ -67,6 +67,15 @@ function printQuiz(data)
 {
     console.log(data["data"]);
     numQuestions=data["data"].length;
+    columnA=[...data["data"]];
+    columnB=[...data["data"]];
+    columnC=[...data["data"]];
+    columnD=[...data["data"]];
+
+    shuffle(columnA);
+    shuffle(columnB);
+    shuffle(columnC);
+    shuffle(columnD);
     
     document.getElementById("rightWrongStatus").innerHTML="--:";
 
@@ -115,18 +124,43 @@ function printQuiz(data)
         let value2=data["data"][i]["value2"];
         let value3=data["data"][i]["value3"];
         let dataUuid=data["data"][i]["uuid"];
-        
+
+        let uuidA=columnA[i]["uuid"];
+        let valueA=columnA[i]["value0"];
+
+        let uuidB=columnB[i]["uuid"];
+        let valueB=columnB[i]["value1"];
+
+        let uuidC=columnC[i]["uuid"];
+        let valueC=columnC[i]["value2"];
+
+        let uuidD=columnA[i]["uuid"];
+        let valueD=columnC[i]["value3"];
+      //  console.log(uuidA,uuidB,uuidC,uuidD);
+     //   console.log(valueA,valueB,valueC,valueD);
+
+     tableRows=tableRows+
+        `
+            <tr>
+                
+                <td id="${uuidA}c0" class='${uuidA}' onclick="handleSelection('${figure}','${uuidA}',0,${numColumns})">${valueA}</td>
+                <td id="${uuidB}c1" class='${uuidB}' onclick="handleSelection('${figure}','${uuidB}',1,${numColumns})">${valueB}</td>
+                <td id="${uuidC}c2" class='${uuidC}' onclick="handleSelection('${figure}','${uuidC}',2,${numColumns})">${valueC}</td>
+                <td id="${uuidD}c3" class='${uuidD}' onclick="handleSelection('${figure}','${uuidD}',3,${numColumns})">${valueD}</td>
+            </tr>
+        `;
+        /*
         tableRows=tableRows+
         `
             <tr>
-               
+                
                 <td id="${dataUuid}c0" class='${dataUuid}' onclick="handleSelection('${figure}','${dataUuid}',0,${numColumns})">${value0}</td>
                 <td id="${dataUuid}c1" class='${dataUuid}' onclick="handleSelection('${figure}','${dataUuid}',1,${numColumns})">${value1}</td>
                 <td id="${dataUuid}c2" class='${dataUuid}' onclick="handleSelection('${figure}','${dataUuid}',2,${numColumns})">${value2}</td>
                 <td id="${dataUuid}c3" class='${dataUuid}' onclick="handleSelection('${figure}','${dataUuid}',3,${numColumns})">${value3}</td>
             </tr>
-
         `;
+        */
     }
     let tableContents=tableOpener+tableHeaders+tableRows+tableCloser;
     document.getElementById("quizTableOutput").innerHTML=tableContents;
